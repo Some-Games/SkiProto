@@ -36,6 +36,10 @@ public class scr_PlayerMovement : MonoBehaviour
         {
             print(Hit_.transform.name);
 
+            if (Hit_.transform.gameObject.layer == LayerMask.NameToLayer("MovingPlatform"))
+                if(!forward_ && !back_ && !left_ && !right_ && !jump_)
+                    gameObject.GetComponent<Rigidbody>().velocity = Hit_.transform.gameObject.GetComponent<Rigidbody>().velocity;
+
             inAir_ = false;
         }
 
