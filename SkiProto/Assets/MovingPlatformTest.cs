@@ -19,7 +19,8 @@ public class MovingPlatformTest : MonoBehaviour
 
         currTime += Time.deltaTime / 3f;
 
-        currPos.z = Mathf.Sin(currTime * 100f) + startZ;
+        currPos.z = Mathf.Sin(currTime * 10f) + startZ;
+        currPos.y = Mathf.Sin(currTime * 10f);
 
         gameObject.GetComponent<Rigidbody>().MovePosition(currPos);
     }

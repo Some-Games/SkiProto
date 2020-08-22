@@ -38,7 +38,13 @@ public class scr_PlayerMovement : MonoBehaviour
 
             if (Hit_.transform.gameObject.layer == LayerMask.NameToLayer("MovingPlatform"))
                 if(!forward_ && !back_ && !left_ && !right_ && !jump_)
+                {
                     gameObject.GetComponent<Rigidbody>().velocity = Hit_.transform.gameObject.GetComponent<Rigidbody>().velocity;
+
+                    Vector3 playerNewPos = gameObject.GetComponent<Rigidbody>().position;
+                    playerNewPos.y = Hit_.transform.gameObject.GetComponent<Rigidbody>().position.y + 0.75f + (gameObject.transform.localScale.y / 2f);
+                    gameObject.GetComponent<Rigidbody>().MovePosition(playerNewPos);
+                }
 
             inAir_ = false;
         }
