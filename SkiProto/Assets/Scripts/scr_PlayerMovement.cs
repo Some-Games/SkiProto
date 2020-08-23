@@ -50,6 +50,7 @@ public class scr_PlayerMovement : MonoBehaviour
         playerVisor.transform.eulerAngles = camVertRot;
     }
 
+    Vector3 oldVector;
     void UpdateMovement()
     {
         float MOVESPEED = 10f;
@@ -68,10 +69,10 @@ public class scr_PlayerMovement : MonoBehaviour
 
         bool inAir_ = true;
         RaycastHit Hit_;
-        Debug.DrawLine(gameObject.transform.position, gameObject.transform.position + (Vector3.down * 1f), Color.red);
-        if (Physics.Raycast(gameObject.transform.position, Vector3.down, out Hit_, 1f))
+        Debug.DrawLine(gameObject.transform.position, gameObject.transform.position + (Vector3.down * 1.1f), Color.red);
+        if (Physics.Raycast(gameObject.transform.position, (Vector3.down * 1.1f), out Hit_, 1f))
         {
-            print(Hit_.transform.name);
+            // print(Hit_.transform.name);
 
             if (Hit_.transform.gameObject.layer == LayerMask.NameToLayer("MovingPlatform"))
                 if (!forward_ && !back_ && !left_ && !right_ && !jump_)
@@ -85,6 +86,8 @@ public class scr_PlayerMovement : MonoBehaviour
 
             inAir_ = false;
         }
+
+        print(inAir_);
 
         if (forward_ && !back_)
             v3_InputVector.x = 1;
@@ -110,6 +113,9 @@ public class scr_PlayerMovement : MonoBehaviour
         }
 
         v3_InputVector.Normalize();
+        v3_InputVector = Vector3.Lerp(oldVector, v3_InputVector, 0.95f);
+
+        oldVector = v3_InputVector;
 
         // Align input vector to player rotation
         v3_InputVector = gameObject.transform.rotation * v3_InputVector;
@@ -141,8 +147,8 @@ public class scr_PlayerMovement : MonoBehaviour
         
         if ( IncreaseFriction_ )
         {
-            frictionAmount += Time.deltaTime * MASS * 5f;
-            if (frictionAmount > 10.0f) frictionAmount = 10.0f;
+            frictionAmount += Time.deltaTime * MASS;
+            if (frictionAmount > 10.0f) frictionAmount = 1.0f;
 
             tempPhysMat.frictionCombine = PhysicMaterialCombine.Maximum;
 
