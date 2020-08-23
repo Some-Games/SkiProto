@@ -17,6 +17,8 @@ public class scr_PlayerMovement : MonoBehaviour
 
         cameraStartRotVert = playerVisor.transform.rotation.x;
         cameraStartRotHoriz = gameObject.transform.rotation.y;
+
+        newX = cameraStartRotVert;
     }
 
     // Update is called once per frame
@@ -27,11 +29,11 @@ public class scr_PlayerMovement : MonoBehaviour
         UpdateMovement();
     }
 
-    
+    float newX;
     void UpdateCamera()
     {
         // Vertical
-        float tempVert = Input.GetAxis("Mouse Y");
+        float tempVert = -Input.GetAxis("Mouse Y");
 
         // Horizontal
         float tempHoriz = Input.GetAxis("Mouse X");
@@ -40,10 +42,11 @@ public class scr_PlayerMovement : MonoBehaviour
         playerRot.y += tempHoriz;
         gameObject.transform.eulerAngles = playerRot;
 
-        // f_CameraVertRotation = Mathf.Clamp(f_CameraVertRotation, -85f, 85f);
+        newX += tempVert;
+        newX = Mathf.Clamp(newX, -85f, 85f);
+
         Vector3 camVertRot = playerVisor.transform.eulerAngles;
-        camVertRot.x = camVertRot.x + tempVert;
-        camVertRot.x = Mathf.Clamp(camVertRot.x, -85f, 85f);
+        camVertRot.x = newX;
         playerVisor.transform.eulerAngles = camVertRot;
     }
 
@@ -138,8 +141,8 @@ public class scr_PlayerMovement : MonoBehaviour
         
         if ( IncreaseFriction_ )
         {
-            frictionAmount += Time.deltaTime * MASS;
-            if (frictionAmount > 1.0f) frictionAmount = 1.0f;
+            frictionAmount += Time.deltaTime * MASS * 5f;
+            if (frictionAmount > 10.0f) frictionAmount = 10.0f;
 
             tempPhysMat.frictionCombine = PhysicMaterialCombine.Maximum;
 
@@ -158,6 +161,7 @@ public class scr_PlayerMovement : MonoBehaviour
         }
 
         tempPhysMat.dynamicFriction = frictionAmount;
+        tempPhysMat.staticFriction = frictionAmount;
 
         gameObject.GetComponent<Collider>().material = tempPhysMat;
 
