@@ -6,21 +6,55 @@ using UnityEngine;
 
 public class scr_PlayerMovement : MonoBehaviour
 {
+    GameObject playerVisor;
+    float cameraStartRotHoriz;
+    float cameraStartRotVert;
+
     // Start is called before the first frame update
     void Start()
     {
-        
+        playerVisor = gameObject.transform.Find("Visor").gameObject;
+
+        cameraStartRotVert = playerVisor.transform.rotation.x;
+        cameraStartRotHoriz = gameObject.transform.rotation.y;
     }
 
     // Update is called once per frame
     void Update()
+    {
+        UpdateCamera();
+
+        UpdateMovement();
+    }
+
+    
+    void UpdateCamera()
+    {
+        // Vertical
+        float tempVert = Input.GetAxis("Mouse Y");
+
+        // Horizontal
+        float tempHoriz = Input.GetAxis("Mouse X");
+
+        Vector3 playerRot = gameObject.transform.eulerAngles;
+        playerRot.y += tempHoriz;
+        gameObject.transform.eulerAngles = playerRot;
+
+        // f_CameraVertRotation = Mathf.Clamp(f_CameraVertRotation, -85f, 85f);
+        Vector3 camVertRot = playerVisor.transform.eulerAngles;
+        camVertRot.x = camVertRot.x + tempVert;
+        camVertRot.x = Mathf.Clamp(camVertRot.x, -85f, 85f);
+        playerVisor.transform.eulerAngles = camVertRot;
+    }
+
+    void UpdateMovement()
     {
         float MOVESPEED = 10f;
 
         Rigidbody thisRigidBody = gameObject.GetComponent<Rigidbody>();
         Vector3 oldVelocity = thisRigidBody.velocity;
         float oldGravity = oldVelocity.y;
-        
+
         Vector3 v3_InputVector = new Vector3();
 
         bool forward_ = Input.GetKey(KeyCode.W);
@@ -37,7 +71,7 @@ public class scr_PlayerMovement : MonoBehaviour
             print(Hit_.transform.name);
 
             if (Hit_.transform.gameObject.layer == LayerMask.NameToLayer("MovingPlatform"))
-                if(!forward_ && !back_ && !left_ && !right_ && !jump_)
+                if (!forward_ && !back_ && !left_ && !right_ && !jump_)
                 {
                     gameObject.GetComponent<Rigidbody>().velocity = Hit_.transform.gameObject.GetComponent<Rigidbody>().velocity;
 
@@ -60,13 +94,13 @@ public class scr_PlayerMovement : MonoBehaviour
             v3_InputVector.z = -1;
 
         // If two opposing directions are held, negate them both
-        if(forward_ && back_)
+        if (forward_ && back_)
         {
             forward_ = false;
             back_ = false;
         }
 
-        if(left_ && right_)
+        if (left_ && right_)
         {
             left_ = false;
             right_ = false;
@@ -74,7 +108,10 @@ public class scr_PlayerMovement : MonoBehaviour
 
         v3_InputVector.Normalize();
 
-        SetFriction(!forward_ && !back_ && !left_ && !right_ && !jump_ && !inAir_ );
+        // Align input vector to player rotation
+        v3_InputVector = gameObject.transform.rotation * v3_InputVector;
+
+        SetFriction(!forward_ && !back_ && !left_ && !right_ && !jump_ && !inAir_);
 
         Vector3 tempVelocity = v3_InputVector * MOVESPEED * thisRigidBody.mass;
         tempVelocity = tempVelocity - oldVelocity;
